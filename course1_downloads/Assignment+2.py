@@ -128,6 +128,8 @@ def answer_four():
     #weights=range(3,0,-1)
     
     Points = pd.Series(3*df['Gold.2'] + 2*df['Silver.2'] + df['Bronze.2'],index=df.index)
+    #pas besoin du pd.Series
+    
     
     return Points
 
@@ -172,10 +174,8 @@ def answer_five():
 
 
 def answer_six():
-    census_df=census_df[census_df['SUMLEV'] == 50]
-    census_df.index=census_df['STNAME']
-        
-    A = census_df.groupby(level=0).agg(lambda x : sum(sorted(x)[-3:]))
+            
+    A = census_df.groupby('STNAME').agg(lambda x : sum(sorted(x)[-3:]))
     A = A.sort_values(by=['CENSUS2010POP'], ascending=False)
     Result = list(A.index[0:3])
 
@@ -210,12 +210,14 @@ def answer_six():
 
 
 def answer_seven():
-    A=census_df['POPESTIMATE2010','POPESTIMATE2011','POPESTIMATE2012','POPESTIMATE2013','POPESTIMATE2014','POPESTIMATE2015']
-    A=census_df.T
+    A=census_df[['POPESTIMATE2010','POPESTIMATE2011','POPESTIMATE2012','POPESTIMATE2013','POPESTIMATE2014','POPESTIMATE2015']]
+    A.index=census_df['CTYNAME']
+    A['DiffPop']=A.T.max()-A.T.min()
+    A = A.sort_values(by='DiffPop', ascending = False)
     
     #census_df['Absolute pop change']=max(census_df['POPESTIMATE2010'])-min(census_df['POPESTIMATE2010'])
     
-    return "YOUR ANSWER HERE"
+    return A.index[0]
 
 
 # ### Question 8
@@ -227,7 +229,8 @@ def answer_seven():
 
 # In[11]:
 
-
 def answer_eight():
-    return "YOUR ANSWER HERE"
-
+    C=census_df.where((census_df['REGION']<=2)&(census_df['CTYNAME'].str.match('Washington'))&(census_df['POPESTIMATE2014']<census_df['POPESTIMATE2015'])).dropna()
+    C=C[['STNAME', 'CTYNAME']].sort_index()
+    return C
+answer_eight()
